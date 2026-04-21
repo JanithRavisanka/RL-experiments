@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rl-experiments"
+version = "0.1.0"
+description = "RL algorithm experiments and baselines"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = [
+  "gymnasium[classic-control,box2d]>=0.29.0",
+  "stable-baselines3>=2.3.0",
+  "torch>=2.1.0",
+  "torchvision>=0.16.0",
+  "numpy>=1.24.0",
+  "matplotlib>=3.7.0",
+  "seaborn>=0.12.0",
+  "tensorboard>=2.13.0",
+  "pandas>=2.0.0",
+  "rich>=13.0.0",
+  "tqdm>=4.65.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=7.0",
+  "ruff>=0.4.0",
+]
+ui = [
+  "streamlit>=1.28.0",
+]
+
+[project.scripts]
+rl-experiments = "rl_experiments.cli.run_all:main"
+rl-play = "rl_experiments.cli.play_model:main"
+rl-view = "rl_experiments.cli.view_agent:main"
+rl-train-ui = "rl_experiments.cli.train_ui:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 120
+src = ["src", "tests"]

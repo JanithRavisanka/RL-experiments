@@ -26,18 +26,14 @@ DQN requires DISCRETE action spaces.
 Mac GPU: device="mps" for Apple Silicon.
 """
 
-import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-
 import gymnasium as gym
 from stable_baselines3 import DQN
 from rich.console import Console
 from rich.rule import Rule
 
-from utils.device_utils import get_device_str
-from utils.metrics import RLMetricsCallback
-from utils.run_paths import build_log_path, build_model_path, make_run_id
+from rl_experiments.utils.device_utils import get_device_str
+from rl_experiments.utils.metrics import RLMetricsCallback
+from rl_experiments.utils.run_paths import build_log_path, build_model_path, make_run_id
 
 console = Console()
 

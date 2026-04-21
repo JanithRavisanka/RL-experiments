@@ -33,3 +33,50 @@ MuZero combines the world-model concept with powerful Monte Carlo Tree Search (M
 1. Agent plays games against itself (Self-Play) using MCTS equipped with the latest networks. MCTS produces improved policies ($\pi$) and value estimates.
 2. Trajectories are stored in a Replay Buffer.
 3. During Unroll Training, we sample sequences from the buffer. The network is trained by unrolling the dynamics network over $K$ steps. It is trained to minimize the combined loss of: predicted policies vs MCTS policies, predicted values vs actual $n$-step bootstrapped returns, and predicted rewards vs actual environmental rewards.
+
+## PETS (Probabilistic Ensembles with Trajectory Sampling)
+*Directory: `advanced/pets/`*
+
+- Uses an ensemble dynamics model for epistemic uncertainty.
+- Plans actions via CEM-based MPC at each decision step.
+- Suitable for continuous control environments.
+
+## MBPO (Model-Based Policy Optimization)
+*Directory: `advanced/mbpo/`*
+
+- Learns dynamics model alongside a policy (SAC-style backbone).
+- Uses short synthetic rollouts to improve sample efficiency.
+- Reuses ensemble dynamics infrastructure from PETS-style modeling.
+
+## PlaNet
+*Directory: `advanced/planet/`*
+
+- Pixel encoder + latent RSSM transition model.
+- Uses planning in latent space instead of direct policy optimization.
+- Logs latent/reward objective components for diagnostics.
+
+## TD-MPC / TD-MPC2
+*Directory: `advanced/tdmpc/`*
+
+- Latent-model control with short-horizon planning and terminal value backup.
+- `tdmpc2` mode increases planning horizon and backup aggressiveness.
+
+## World Models
+*Directory: `advanced/world_models/`*
+
+- VAE latent representation learning.
+- Recurrent latent dynamics (MDN-RNN style approximation).
+- Controller optimization over latent features.
+
+## I2A (Imagination-Augmented Agents)
+*Directory: `advanced/i2a/`*
+
+- Learns an environment model and rolls imagined transitions.
+- Aggregates imagined outcomes into policy/value decision layers.
+- Targeted first for discrete-control tasks.
+
+## MVE / STEVE
+*Directory: `advanced/mve_steve/`*
+
+- MVE: multi-step model-based value expansion targets.
+- STEVE: uncertainty-weighted mixture of multi-horizon targets across model ensemble predictions.

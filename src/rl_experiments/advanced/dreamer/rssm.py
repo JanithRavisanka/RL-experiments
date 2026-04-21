@@ -226,8 +226,12 @@ class RSSM(nn.Module):
 
         kl = max(KL[q‖p], free_bits)
         """
-        kl = torch.zeros(1)
+        if not priors:
+            return torch.tensor(0.0)
+        # Accumulate on the same device as KL terms (avoid torch.zeros(1) on CPU vs MPS/CUDA).
+        kl_sum = None
         for prior, post in zip(priors, posts):
             kl_step = torch.distributions.kl_divergence(post, prior).sum(-1)  # (B,)
-            kl = kl + kl_step.clamp(min=free_bits).mean()
-        return kl / len(priors)
+            part = kl_step.clamp(min=free_bits).mean()
+            kl_sum = part if kl_sum is None else kl_sum + part
+        return kl_sum / len(priors)

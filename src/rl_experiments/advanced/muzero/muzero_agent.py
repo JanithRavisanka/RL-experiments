@@ -33,10 +33,6 @@ Training Algorithm (Algorithm 1 from the paper):
 Mac GPU: device="mps" for Apple Silicon.
 """
 
-import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-
 import numpy as np
 import torch
 import torch.nn as nn
@@ -47,9 +43,9 @@ from tqdm import tqdm
 from rich.console import Console
 from rich.rule import Rule
 
-from utils.device_utils import get_device
-from utils.metrics import ExperimentLogger
-from utils.run_paths import build_custom_model_path, build_log_path, make_run_id
+from rl_experiments.utils.device_utils import get_device
+from rl_experiments.utils.metrics import ExperimentLogger
+from rl_experiments.utils.run_paths import build_custom_model_path, build_log_path, make_run_id
 from .networks       import RepresentationNetwork, DynamicsNetwork, PredictionNetwork, to_one_hot
 from .mcts           import MCTS
 from .replay_buffer  import MuZeroReplayBuffer, GameTrajectory, Transition

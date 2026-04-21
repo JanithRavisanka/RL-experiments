@@ -27,8 +27,14 @@ python run_all.py --phase 1
 # Phase 2 only (Generate Behavioral Analysis multi-seed plots)
 python run_all.py --phase 2
 
-# Phase 3 only (Train Advanced algorithms: Dreamer & MuZero)
+# Phase 3 only (Train advanced algorithms)
 python run_all.py --phase 3
+
+# Phase 3 with selected model-based algorithms
+python run_all.py --phase 3 --algorithms pets mbpo planet tdmpc world_models i2a mve steve
+
+# Run complete model-based suite in phase 3
+python run_all.py --phase 3 --all-model-based
 
 # Phase 4 only (Generate Final Paradigm Comparison plots)
 python run_all.py --phase 4

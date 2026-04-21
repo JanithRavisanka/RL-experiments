@@ -19,10 +19,6 @@ This script:
 Mac GPU: inherits device from utils/device_utils.py
 """
 
-import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
@@ -31,10 +27,10 @@ from rich.console import Console
 from rich.rule import Rule
 from rich.table import Table
 
-from utils.metrics import smooth
-from baselines.ppo_experiment import run_ppo_multiseed
-from baselines.sac_experiment import run_sac_multiseed
-from baselines.dqn_experiment import run_dqn_multiseed
+from rl_experiments.utils.metrics import smooth
+from rl_experiments.baselines.ppo_experiment import run_ppo_multiseed
+from rl_experiments.baselines.sac_experiment import run_sac_multiseed
+from rl_experiments.baselines.dqn_experiment import run_dqn_multiseed
 
 console = Console()
 

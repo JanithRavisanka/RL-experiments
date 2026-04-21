@@ -4,11 +4,12 @@ Train, compare, and visualize modern Reinforcement Learning algorithms with a cl
 
 This repository includes:
 
-- Baseline model-free methods using Stable-Baselines3 (`PPO`, `SAC`, `DQN`)
-- Advanced custom PyTorch agents (`Dreamer`, `MuZero`)
-- Experiment orchestration (`run_all.py`)
-- Agent playback (`view_agent.py`)
+- Baseline model-free methods (`PPO`, `SAC`, `DQN`) and DQN-family variants (`Double DQN`, `PER-DQN`, `Rainbow`)
+- Advanced custom PyTorch agents (`Dreamer`, `MuZero`, `PETS`, `MBPO`, `PlaNet`, `TD-MPC/TD-MPC2`, `World Models`, `I2A`, `MVE`, `STEVE`)
+- Experiment orchestration (`run_all.py` / `rl-experiments` CLI)
+- Agent playback (`view_agent.py` / `rl-view`, `play_model.py` / `rl-play`)
 - Plotting and analysis scripts
+- Unified Python API: `TrainConfig` + `train()` for every algorithm ([`src/rl_experiments/api/`](src/rl_experiments/api/))
 
 ## Features
 
@@ -22,14 +23,14 @@ This repository includes:
 
 ```text
 RL-experiments/
-├── baselines/          # PPO, SAC, DQN experiment scripts
-├── advanced/           # Dreamer and MuZero implementations
-├── experiments/        # Comparison experiments
-├── analysis/           # Plotting and generated figures
-├── utils/              # Device helpers, metrics, run path utilities
+├── src/rl_experiments/ # Installable package (baselines, advanced, utils, analysis, api, cli, playback)
+├── tests/              # Pytest smoke tests
 ├── docs/               # Extended documentation
-├── run_all.py          # Master runner
-└── view_agent.py       # Model viewer / replay exporter
+├── run_all.py          # Thin wrapper → rl_experiments.cli.run_all
+├── view_agent.py       # Thin wrapper → rl_experiments.cli.view_agent
+├── play_model.py       # Thin wrapper → rl_experiments.cli.play_model
+├── pyproject.toml      # Package metadata + optional dev deps
+└── requirements.txt    # Legacy flat list (optional; prefer pyproject)
 ```
 
 ## Setup
@@ -48,10 +49,19 @@ python3 -m venv venv
 source venv/bin/activate
 ```
 
-1) Install dependencies:
+1) Install the package in editable mode (recommended):
+
+```bash
+pip install -e ".[dev]"
+```
+
+This installs console scripts `rl-experiments`, `rl-play`, and `rl-view`, and adds `rl_experiments` to your Python path so you do not need `PYTHONPATH` hacks.
+
+Alternatively, install dependencies only:
 
 ```bash
 pip install -r requirements.txt
+pip install -e .
 ```
 
 ## Quick Start
@@ -60,6 +70,8 @@ Run a quick smoke test (reduced timesteps):
 
 ```bash
 python run_all.py --phase 1 --quick --seeds 0
+# same: rl-experiments --phase 1 --quick --seeds 0
+# same: python -m rl_experiments --phase 1 --quick --seeds 0
 ```
 
 Run full phase workflows:
@@ -71,8 +83,14 @@ python run_all.py --phase 1
 # Phase 2: baseline behavioral analysis/comparison
 python run_all.py --phase 2
 
-# Phase 3: advanced algorithms (Dreamer, MuZero)
+# Phase 3: advanced algorithms (default: Dreamer, MuZero)
 python run_all.py --phase 3
+
+# Phase 3: specific model-based algorithms
+python run_all.py --phase 3 --algorithms pets mbpo planet tdmpc tdmpc2 world_models i2a mve steve
+
+# Phase 3: full model-based suite
+python run_all.py --phase 3 --all-model-based
 
 # Phase 4: plotting and final comparisons
 python run_all.py --phase 4
@@ -129,14 +147,59 @@ Each training invocation gets a timestamp `run_id` to avoid overwrites.
 - **PPO**: on-policy clipped policy gradient baseline
 - **SAC**: entropy-regularized off-policy actor-critic for continuous control
 - **DQN**: value-based method for discrete action spaces
+- **Double DQN**: reduced Q overestimation via decoupled action selection/evaluation
+- **PER-DQN**: TD-error-prioritized replay with importance-sampling correction
+- **Rainbow DQN**: Double + Dueling + PER + n-step + Noisy Nets + C51
 - **Dreamer**: model-based latent world model + imagination actor-critic
 - **MuZero**: learned dynamics with planning via MCTS
+- **PETS**: probabilistic ensemble dynamics with MPC/CEM planning
+- **MBPO**: model-based policy optimization with short synthetic rollouts
+- **PlaNet**: latent RSSM world model with planning in latent space
+- **TD-MPC / TD-MPC2**: latent dynamics with planning + value backup
+- **World Models**: VAE + MDN-RNN + controller pipeline
+- **I2A**: imagination-augmented policy with learned rollout model
+- **MVE / STEVE**: model-based value expansion and uncertainty-weighted targets
+
+## Training UI (Streamlit)
+
+Install the optional UI extra, then launch the browser-based picker for phases and algorithms:
+
+```bash
+pip install -e ".[ui]"
+rl-train-ui
+# or: streamlit run src/rl_experiments/ui/train_app.py
+# or: python train_ui.py
+```
+
+The UI calls the same `run_experiments` pipeline as the CLI. Progress from Rich still appears in the terminal where Streamlit is running.
+
+CLI equivalents:
+
+- `--phases 1 3` — run only phases 1 and 3
+- `--phase1-include ppo sac dqn` — subset of Phase 1 baselines
+- `--strict-phase3` — do not default to Dreamer+MuZero when `--algorithms` is empty
+
+## Programmatic training (unified API)
+
+```python
+from rl_experiments.api.training import TrainConfig, train
+
+train(TrainConfig(
+    "ppo",
+    "CartPole-v1",
+    seed=0,
+    run_id="20260101_120000",
+    budget_steps=200_000,
+))
+```
+
+Use `train()` with any registered algorithm id (`ppo`, `sac`, `dqn`, `dreamer`, `pets`, …). See [`src/rl_experiments/api/registry.py`](src/rl_experiments/api/registry.py).
 
 ## Notes
 
 - Some environments (e.g., Box2D variants) may require local system packages.
-- `view_agent.py` discovers `.zip` models recursively under `results/`.
-- Advanced Dreamer/MuZero checkpoints are `.pt` files and are not loaded by `view_agent.py`.
+- `view_agent` / `rl-view` discovers `.zip` models recursively under `results/`.
+- Advanced Dreamer/MuZero checkpoints are `.pt` files; use `play_model` / `rl-play` for those.
 
 ## Documentation
 
