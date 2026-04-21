@@ -41,14 +41,14 @@ git clone <your-repo-url>
 cd RL-experiments
 ```
 
-2) Create and activate a virtual environment:
+1) Create and activate a virtual environment:
 
 ```bash
 python3 -m venv venv
 source venv/bin/activate
 ```
 
-3) Install dependencies:
+1) Install dependencies:
 
 ```bash
 pip install -r requirements.txt
@@ -121,6 +121,8 @@ Each training invocation gets a timestamp `run_id` to avoid overwrites.
   - `results/<run_id>/<algo>_<env>_seed<seed>_<run_id>.zip`
 - Advanced checkpoints:
   - `results/<run_id>/<algo>/<env>/<algo>_seed<seed>_<run_id>.pt`
+- Run metadata:
+  - `results/<run_id>/metadata.json` and `logs/<run_id>/metadata.json`
 
 ## Main Algorithms
 

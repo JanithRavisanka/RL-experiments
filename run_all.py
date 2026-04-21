@@ -15,6 +15,7 @@ Usage:
 """
 
 import argparse
+import json
 import os
 import sys
 import time
@@ -57,7 +58,7 @@ def parse_args():
 # Phase runners
 # ─────────────────────────────────────────────────────────────────────────────
 
-def run_phase1(seeds, quick: bool = False):
+def run_phase1(seeds, run_id: str, quick: bool = False):
     """Phase 1 — Foundation: PPO, SAC, DQN baselines."""
     from baselines.ppo_experiment import run_ppo
     from baselines.sac_experiment import run_sac
@@ -68,16 +69,16 @@ def run_phase1(seeds, quick: bool = False):
 
     for seed in seeds:
         # PPO
-        run_ppo("CartPole-v1",              int(200_000 * ts_scale), seed, run_id=make_run_id())
-        run_ppo("LunarLander-v3",           int(300_000 * ts_scale), seed, run_id=make_run_id())
+        run_ppo("CartPole-v1",              int(200_000 * ts_scale), seed, run_id=run_id)
+        run_ppo("LunarLander-v3",           int(300_000 * ts_scale), seed, run_id=run_id)
 
         # SAC
-        run_sac("Pendulum-v1",              int(100_000 * ts_scale), seed, run_id=make_run_id())
-        run_sac("LunarLanderContinuous-v3", int(300_000 * ts_scale), seed, run_id=make_run_id())
+        run_sac("Pendulum-v1",              int(100_000 * ts_scale), seed, run_id=run_id)
+        run_sac("LunarLanderContinuous-v3", int(300_000 * ts_scale), seed, run_id=run_id)
 
         # DQN
-        run_dqn("CartPole-v1",              int(200_000 * ts_scale), seed, run_id=make_run_id())
-        run_dqn("LunarLander-v3",           int(300_000 * ts_scale), seed, run_id=make_run_id())
+        run_dqn("CartPole-v1",              int(200_000 * ts_scale), seed, run_id=run_id)
+        run_dqn("LunarLander-v3",           int(300_000 * ts_scale), seed, run_id=run_id)
 
 
 def run_phase2(seeds):
@@ -87,7 +88,7 @@ def run_phase2(seeds):
     compare_main()
 
 
-def run_phase3(seeds, quick: bool = False):
+def run_phase3(seeds, run_id: str, quick: bool = False):
     """Phase 3 — Advanced: Dreamer + MuZero."""
     from advanced.dreamer.dreamer_agent import DreamerAgent
     from advanced.muzero.muzero_agent   import MuZeroAgent
@@ -100,15 +101,37 @@ def run_phase3(seeds, quick: bool = False):
         agent = DreamerAgent("CartPole-v1", seed=seed)
         agent.train(
             n_episodes=int(300 * n_ep_scale),
-            run_id=make_run_id(),
+            run_id=run_id,
         )
 
         # MuZero
         agent = MuZeroAgent("CartPole-v1", seed=seed)
         agent.train(
             n_episodes=int(200 * n_ep_scale),
-            run_id=make_run_id(),
+            run_id=run_id,
         )
+
+
+def write_run_metadata(run_id: str, args, start_unix: float, start_iso: str):
+    """Persist run metadata for traceability and reproducibility."""
+    results_dir = Path("results") / run_id
+    logs_dir = Path("logs") / run_id
+    results_dir.mkdir(parents=True, exist_ok=True)
+    logs_dir.mkdir(parents=True, exist_ok=True)
+
+    metadata = {
+        "run_id": run_id,
+        "started_at_iso": start_iso,
+        "started_at_unix": start_unix,
+        "command": " ".join(sys.argv),
+        "args": vars(args),
+        "python": sys.version.split()[0],
+        "cwd": str(Path.cwd()),
+    }
+
+    metadata_text = json.dumps(metadata, indent=2)
+    (results_dir / "metadata.json").write_text(metadata_text + "\n", encoding="utf-8")
+    (logs_dir / "metadata.json").write_text(metadata_text + "\n", encoding="utf-8")
 
 
 def run_phase4():
@@ -153,6 +176,9 @@ def print_experiment_plan(args):
 
 def main():
     args = parse_args()
+    run_start = time.time()
+    start_iso = time.strftime("%Y-%m-%dT%H:%M:%S%z", time.localtime(run_start))
+    run_id = make_run_id()
 
     # Create output directories
     for d in ["logs", "results", "analysis/figures"]:
@@ -170,17 +196,19 @@ def main():
     ))
 
     print_experiment_plan(args)
+    console.print(f"  [dim]Run ID: {run_id}[/dim]")
 
-    t0 = time.time()
+    write_run_metadata(run_id, args, run_start, start_iso)
+    t0 = run_start
 
     if args.phase is None or args.phase == 1:
-        run_phase1(args.seeds, args.quick)
+        run_phase1(args.seeds, run_id=run_id, quick=args.quick)
 
     if args.phase is None or args.phase == 2:
         run_phase2(args.seeds)
 
     if args.phase is None or args.phase == 3:
-        run_phase3(args.seeds, args.quick)
+        run_phase3(args.seeds, run_id=run_id, quick=args.quick)
 
     if args.phase is None or args.phase == 4:
         run_phase4()

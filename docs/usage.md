@@ -10,6 +10,7 @@ Each training invocation now gets a timestamp-based run ID in artifact names, so
 Example pattern:
 - models: `results/<run_id>/<algo>_<env>_seed<seed>_<run_id>.zip` (SB3) or `results/<run_id>/<algo>/<env>/<algo>_seed<seed>_<run_id>.pt` (Dreamer/MuZero)
 - logs: `logs/<run_id>/<algo>_<env>_seed<seed>_<run_id>.csv`
+- metadata: `results/<run_id>/metadata.json` and `logs/<run_id>/metadata.json`
 
 **Basic Usage:**
 ```bash
@@ -52,18 +53,18 @@ python view_agent.py
 **Direct Mode:**
 Target a specific model directly.
 ```bash
-python view_agent.py --model results/ppo_cartpole_v1_seed0.zip
+python view_agent.py --model "results/<run_id>/ppo_cartpole_v1_seed0_<run_id>.zip"
 ```
 
 **Run specific number of episodes:**
 ```bash
-python view_agent.py --model results/ppo_cartpole_v1_seed0.zip --episodes 5
+python view_agent.py --model "results/<run_id>/ppo_cartpole_v1_seed0_<run_id>.zip" --episodes 5
 ```
 
 **Export to GIF or MP4:**
 If you want to save the output instead of opening a live window (useful for presentations):
 ```bash
-python view_agent.py --model results/ppo_cartpole_v1_seed0.zip --gif
-python view_agent.py --model results/ppo_cartpole_v1_seed0.zip --video
+python view_agent.py --model "results/<run_id>/ppo_cartpole_v1_seed0_<run_id>.zip" --gif
+python view_agent.py --model "results/<run_id>/ppo_cartpole_v1_seed0_<run_id>.zip" --video
 ```
 *Note: Video export requires `imageio[ffmpeg]`. GIFs use standard `Pillow`.* Outputs are saved to `analysis/`.
