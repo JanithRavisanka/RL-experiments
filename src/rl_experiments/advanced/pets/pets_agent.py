@@ -5,7 +5,6 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 from rich.console import Console
-from rich.rule import Rule
 
 from rl_experiments.advanced.common.envs import make_state_env
 from rl_experiments.advanced.common.models import EnsembleDynamics
@@ -69,8 +68,10 @@ def train_pets(env_id: str = "Pendulum-v1", n_steps: int = 40_000, seed: int = 0
                 pred = model(b_obs, b_act)
                 pred_ds = pred[:, :, :obs_dim]
                 pred_r = pred[:, :, -1]
-                target_ds = (b_nobs - b_obs).unsqueeze(0)
-                target_r = b_rew.unsqueeze(0)
+                # Same Δs, r for every ensemble head — expand to [ensemble, batch, …] (no broadcast with pred)
+                delta = b_nobs - b_obs
+                target_ds = delta.unsqueeze(0).expand_as(pred_ds)
+                target_r = b_rew.unsqueeze(0).expand_as(pred_r)
                 loss = F.mse_loss(pred_ds, target_ds) + F.mse_loss(pred_r, target_r)
                 optim.zero_grad()
                 loss.backward()

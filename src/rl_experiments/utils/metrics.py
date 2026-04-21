@@ -5,12 +5,11 @@ Metrics collection and CSV logging utilities for all RL experiments.
 """
 
 import csv
-import os
 import time
 import numpy as np
 from pathlib import Path
-from dataclasses import dataclass, field
-from typing import List, Dict, Optional
+from dataclasses import dataclass
+from typing import List, Optional
 from stable_baselines3.common.callbacks import BaseCallback
 
 

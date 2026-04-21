@@ -35,7 +35,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.distributions import Normal, Independent
-from typing import Tuple, Optional
+from typing import Tuple
 
 
 # ─────────────────────────────────────────────────────────────────────────────

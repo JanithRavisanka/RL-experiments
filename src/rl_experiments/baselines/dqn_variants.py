@@ -10,6 +10,7 @@ Implemented variants:
 
 The architecture follows the cited papers, adapted to low-dimensional state inputs
 used in this repository (CartPole/LunarLander), replacing Atari CNN encoders with MLPs.
+See ``docs/algorithm_fidelity.md`` for scope, verified properties (e.g. Double DQN decoupling), and intentional deviations from full benchmark pipelines.
 """
 
 from __future__ import annotations
@@ -26,7 +27,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 import gymnasium as gym
 from rich.console import Console
-from rich.rule import Rule
 
 from rl_experiments.utils.device_utils import get_device
 from rl_experiments.utils.metrics import ExperimentLogger
@@ -462,16 +462,16 @@ def train_dqn_variant(
                     tz = b_rew.unsqueeze(1) + (1.0 - b_done.unsqueeze(1)) * gamma_n * support.unsqueeze(0)
                     tz = tz.clamp(cfg.v_min, cfg.v_max)
                     b = (tz - cfg.v_min) / delta_z
-                    l = b.floor().long()
+                    lower_idx = b.floor().long()
                     u = b.ceil().long()
 
                     proj = torch.zeros_like(next_dist)
                     offset = torch.arange(cfg.batch_size, device=device).unsqueeze(1) * cfg.n_atoms
                     proj.view(-1).index_add_(
-                        0, (l + offset).view(-1), (next_dist * (u.float() - b)).view(-1)
+                        0, (lower_idx + offset).view(-1), (next_dist * (u.float() - b)).view(-1)
                     )
                     proj.view(-1).index_add_(
-                        0, (u + offset).view(-1), (next_dist * (b - l.float())).view(-1)
+                        0, (u + offset).view(-1), (next_dist * (b - lower_idx.float())).view(-1)
                     )
 
                 per_sample_loss = -(proj * act_dist.log()).sum(dim=1)

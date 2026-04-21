@@ -3,6 +3,8 @@ Rainbow DQN experiment runner.
 Hessel et al., 2018 — Rainbow: Combining Improvements in Deep RL.
 """
 
+import os
+
 from rich.console import Console
 from rich.rule import Rule
 

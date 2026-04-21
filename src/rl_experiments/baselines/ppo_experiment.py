@@ -18,10 +18,10 @@ Architecture faithful to original paper:
 Mac GPU: Stable-Baselines3 accepts device="mps" for Apple Silicon.
 """
 
-import gymnasium as gym
+import os
+
 from stable_baselines3 import PPO
 from stable_baselines3.common.env_util import make_vec_env
-from stable_baselines3.common.vec_env import VecNormalize
 from rich.console import Console
 from rich.rule import Rule
 
@@ -47,7 +47,7 @@ PPO_CONFIG = {
     "gae_lambda":       0.95,       # GAE λ for advantage estimation
     "clip_range":       0.2,        # ε — clipping parameter
     "clip_range_vf":    None,       # No VF clipping (matches paper default)
-    "ent_coef":         0.0,        # Entropy bonus c₂ (0 for classic envs)
+    "ent_coef":         0.0,        # Entropy bonus c₂ (0 is common for discrete toy tasks; paper often uses >0 for exploration)
     "vf_coef":          0.5,        # Value loss coefficient c₁
     "max_grad_norm":    0.5,        # Gradient norm clipping
     "normalize_advantage": True,    # Normalize advantages per mini-batch

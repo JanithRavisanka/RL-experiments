@@ -2,6 +2,8 @@
 
 Welcome to the **RL Experiments** documentation. This project is a comprehensive toolkit for training, viewing, and analyzing various Reinforcement Learning (RL) algorithms natively on macOS, heavily utilizing PyTorch's MPS (Metal Performance Shaders) backend for Apple Silicon GPUs.
 
+**Paper alignment:** Implementations follow standard objectives and cited hyperparameter families, but many are **scaled for classic control / vector observations**. See [Algorithm fidelity vs original papers](algorithm_fidelity.md) for a method-by-method statement of what matches references and what is simplified.
+
 ## Project Structure
 
 The codebase is organized into four main phases, modeled as different modules:
@@ -20,7 +22,7 @@ The codebase is organized into four main phases, modeled as different modules:
 - **`experiments/`**
   Scripts to run large-scale comparative multi-seed experiments.
   - `compare_phase1.py` - Runs variance analysis for baselines.
-  - `run_advanced.py` - Runs Dreamer/MuZero experiments.
+  - `run_advanced.py` - Programmatic helpers (`run_dreamer`, `run_muzero`) for notebooks or scripts; use `rl-experiments` / `run_all.py` for full phased runs.
 
 - **`analysis/`**
   Houses scripts to generate publication-quality dark-themed plots comparing learning curves, sample efficiency, and paradigm differences.
@@ -30,6 +32,8 @@ The codebase is organized into four main phases, modeled as different modules:
 
 ## Quick Navigation
 
+- [Algorithm fidelity vs original papers](algorithm_fidelity.md)
+- [Algorithm documentation hub](algorithms/index.md)
 - [Setup Instructions](setup.md)
 - [How to Run & View Agents](usage.md)
 - [Baseline Algorithms (Model-Free)](baselines.md)

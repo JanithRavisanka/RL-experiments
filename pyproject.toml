@@ -28,15 +28,11 @@ dev = [
   "pytest>=7.0",
   "ruff>=0.4.0",
 ]
-ui = [
-  "streamlit>=1.28.0",
-]
 
 [project.scripts]
 rl-experiments = "rl_experiments.cli.run_all:main"
 rl-play = "rl_experiments.cli.play_model:main"
 rl-view = "rl_experiments.cli.view_agent:main"
-rl-train-ui = "rl_experiments.cli.train_ui:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

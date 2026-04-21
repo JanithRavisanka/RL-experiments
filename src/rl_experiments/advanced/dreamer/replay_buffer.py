@@ -14,7 +14,7 @@ Paper: Hafner et al. 2019 §B.3 — "collect episodes, sample of length L=50"
 
 import numpy as np
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import List
 import torch
 
 

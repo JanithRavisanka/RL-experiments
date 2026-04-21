@@ -5,7 +5,6 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 from rich.console import Console
-from rich.rule import Rule
 
 from rl_experiments.advanced.common.envs import make_state_env
 from rl_experiments.advanced.common.models import EnsembleDynamics, MLPPolicy, MLPValue

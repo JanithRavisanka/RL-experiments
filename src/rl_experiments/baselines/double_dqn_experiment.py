@@ -3,6 +3,8 @@ Double DQN experiment runner.
 van Hasselt et al., 2015 — Deep Reinforcement Learning with Double Q-learning.
 """
 
+import os
+
 from rich.console import Console
 from rich.rule import Rule
 

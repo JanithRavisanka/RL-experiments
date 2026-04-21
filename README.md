@@ -11,6 +11,10 @@ This repository includes:
 - Plotting and analysis scripts
 - Unified Python API: `TrainConfig` + `train()` for every algorithm ([`src/rl_experiments/api/`](src/rl_experiments/api/))
 
+**Paper alignment:** Training code is structured to match canonical algorithms (SB3 for baselines; custom modules for advanced methods), but hyperparameters and architectures are often **scaled for small envs** rather than full Atari / DMControl benchmarks. See [`docs/algorithm_fidelity.md`](docs/algorithm_fidelity.md) for a concise audit.
+
+**Deep algorithm docs:** Academic-style notes (intuition, equations, architecture, and code anchors) for every registered algorithm are in [`docs/algorithms/index.md`](docs/algorithms/index.md), with Mermaid diagrams and citations.
+
 ## Features
 
 - Phase-based experiment runner (train, compare, advanced, plots)
@@ -102,6 +106,12 @@ Run all phases:
 python run_all.py
 ```
 
+Additional options (same flags work with `rl-experiments` / `run_all.py`):
+
+- `--phases 1 3` — run only phases 1 and 3
+- `--phase1-include ppo sac dqn` — subset of Phase 1 baselines
+- `--strict-phase3` — do not default to Dreamer+MuZero when `--algorithms` is empty
+
 ## Viewing Trained Agents
 
 List discovered models:
@@ -159,25 +169,6 @@ Each training invocation gets a timestamp `run_id` to avoid overwrites.
 - **World Models**: VAE + MDN-RNN + controller pipeline
 - **I2A**: imagination-augmented policy with learned rollout model
 - **MVE / STEVE**: model-based value expansion and uncertainty-weighted targets
-
-## Training UI (Streamlit)
-
-Install the optional UI extra, then launch the browser-based picker for phases and algorithms:
-
-```bash
-pip install -e ".[ui]"
-rl-train-ui
-# or: streamlit run src/rl_experiments/ui/train_app.py
-# or: python train_ui.py
-```
-
-The UI calls the same `run_experiments` pipeline as the CLI. Progress from Rich still appears in the terminal where Streamlit is running.
-
-CLI equivalents:
-
-- `--phases 1 3` — run only phases 1 and 3
-- `--phase1-include ppo sac dqn` — subset of Phase 1 baselines
-- `--strict-phase3` — do not default to Dreamer+MuZero when `--algorithms` is empty
 
 ## Programmatic training (unified API)
 

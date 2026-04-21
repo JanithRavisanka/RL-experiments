@@ -1,5 +1,5 @@
 """
-analysis/plot_results.py
+analysis/plot_figures.py
 ─────────────────────────────────────────────────────────────────────────────
 Comprehensive plotting module for all RL experiments.
 
@@ -292,8 +292,14 @@ def plot_paradigm_comparison(log_dir: str = "logs", out_dir: str = "analysis/fig
         means  = [final_means[a][0] for a in algos]
         stds   = [final_means[a][1] for a in algos]
         colors = [ALGO_COLORS[a] for a in algos]
-        bars = ax_bar.bar(algos, means, yerr=stds, color=colors,
-                          capsize=5, error_kw={"ecolor": "white", "elinewidth": 1.5})
+        ax_bar.bar(
+            algos,
+            means,
+            yerr=stds,
+            color=colors,
+            capsize=5,
+            error_kw={"ecolor": "white", "elinewidth": 1.5},
+        )
         _style_ax(ax_bar, title="Final Reward\n(last 20 episodes)",
                   xlabel="Algorithm", ylabel="Mean Reward")
         ax_bar.tick_params(axis="x", colors=TEXT_COLOR, labelsize=9)

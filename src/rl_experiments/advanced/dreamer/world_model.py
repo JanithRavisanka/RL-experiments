@@ -26,9 +26,8 @@ Loss (total world model loss):
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.distributions import Normal, Bernoulli
 
-from .rssm import RSSM, MLP, GaussianHead
+from .rssm import RSSM, MLP
 
 
 class WorldModel(nn.Module):

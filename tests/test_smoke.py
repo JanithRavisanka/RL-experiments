@@ -6,7 +6,7 @@ import sys
 
 def test_import_package():
     import rl_experiments
-    from rl_experiments.api.training import TrainConfig, TrainResult, train
+    from rl_experiments.api.training import TrainConfig
 
     assert rl_experiments.__version__
     assert TrainConfig("ppo", "CartPole-v1", 0, run_id="test").algorithm == "ppo"

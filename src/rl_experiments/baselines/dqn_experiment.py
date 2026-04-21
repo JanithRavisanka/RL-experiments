@@ -26,6 +26,8 @@ DQN requires DISCRETE action spaces.
 Mac GPU: device="mps" for Apple Silicon.
 """
 
+import os
+
 import gymnasium as gym
 from stable_baselines3 import DQN
 from rich.console import Console

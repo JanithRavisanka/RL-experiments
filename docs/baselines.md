@@ -1,92 +1,64 @@
-# Baseline Algorithms (Phase 1 & 2)
+# Baseline Algorithms (Phase 1 and 2)
 
-We use **Stable-Baselines3** to ensure robust, paper-faithful implementations of standard model-free algorithms. These act as our gold standard for measuring custom approaches later on.
+This page is a **concise overview** and comparison. For **full academic-style treatment** (MDP notation, objectives, equations, and code anchors), use the per-algorithm pages in [`algorithms/index.md`](algorithms/index.md).
 
-All baseline scripts are found in `baselines/`.
+Baseline algorithms are split into two groups:
+- **SB3 implementations**: PPO, SAC, DQN
+- **Custom DQN family**: Double DQN, PER-DQN, Rainbow
 
-## Proximal Policy Optimization (PPO)
-*File: `baselines/ppo_experiment.py`*
+Deep pages:
+- [PPO](algorithms/ppo.md), [SAC](algorithms/sac.md), [DQN](algorithms/dqn.md)
+- [Double DQN](algorithms/double_dqn.md), [PER-DQN](algorithms/per_dqn.md), [Rainbow](algorithms/rainbow.md)
 
-**Characteristics:**
-- On-policy
-- Model-free
-- Discrete or Continuous action spaces
-- Highly stable due to clipped surrogate objective function that prevents destructively large policy updates.
+## Baseline comparison chart
 
-**Tested On:**
-- `CartPole-v1`
-- `LunarLander-v3`
+| Algorithm | Family | On/Off policy | Action space | Replay | Core stabilization |
+|---|---|---|---|---|---|
+| PPO | policy gradient | on-policy | discrete/continuous | no | clipped objective + GAE |
+| SAC | actor-critic | off-policy | continuous | yes | twin-Q + entropy temperature |
+| DQN | value-based | off-policy | discrete | yes | target network + epsilon-greedy |
+| Double DQN | DQN variant | off-policy | discrete | yes | decoupled action selection/evaluation |
+| PER-DQN | DQN variant | off-policy | discrete | prioritized | TD-error weighted replay |
+| Rainbow | DQN variant | off-policy | discrete | prioritized | Double + Dueling + PER + n-step + Noisy + C51 |
 
-## Deep Q-Network (DQN)
-*File: `baselines/dqn_experiment.py`*
+## Training flow (baseline pipeline)
 
-**Characteristics:**
-- Off-policy
-- Model-free
-- Discrete action spaces only
-- Bootstraps value estimates and utilizes a target network + replay buffer to stabilize Q-learning.
+```mermaid
+flowchart LR
+  runner[baseline_runner] --> env[environment_steps]
+  env --> data[rollout_or_replay_data]
+  data --> loss[algorithm_specific_loss]
+  loss --> optimizer[gradient_update]
+  optimizer --> logs[csv_and_tensorboard]
+  optimizer --> ckpt[checkpoint_save]
+```
 
-**Tested On:**
-- `CartPole-v1`
-- `LunarLander-v3`
+## Implementation anchors
 
-## Double DQN
-*File: `baselines/double_dqn_experiment.py`*
+- SB3 runners:
+  - `src/rl_experiments/baselines/ppo_experiment.py`
+  - `src/rl_experiments/baselines/sac_experiment.py`
+  - `src/rl_experiments/baselines/dqn_experiment.py`
+- Custom DQN-family core:
+  - `src/rl_experiments/baselines/dqn_variants.py`
+- Dispatch layer:
+  - `src/rl_experiments/api/registry.py`
 
-**Paper alignment (van Hasselt et al., 2015):**
-- Decouples action selection and action evaluation in TD target:
-  - `a* = argmax_a Q_online(s', a)`
-  - `y = r + γ Q_target(s', a*)`
-- Reduces overestimation bias compared to vanilla DQN.
+## Code segments
 
-**Tested On:**
-- `CartPole-v1`
-- `LunarLander-v3`
+```python
+# SB3 baseline pattern
+model = PPO("MlpPolicy", vec_env, seed=seed, **PPO_CONFIG)
+model.learn(total_timesteps=total_timesteps, callback=cb, progress_bar=True)
+```
 
-## Prioritized Experience Replay DQN (PER-DQN)
-*File: `baselines/per_dqn_experiment.py`*
+```python
+# Double DQN target logic in dqn_variants.py
+next_a = net(b_nobs).argmax(dim=1, keepdim=True)
+next_q = tgt(b_nobs).gather(1, next_a).squeeze(1)
+target = b_rew + (1.0 - b_done) * (cfg.gamma ** n_step) * next_q
+```
 
-**Paper alignment (Schaul et al., 2015):**
-- Proportional prioritization: `P(i) ∝ |δ_i|^α`
-- Importance-sampling correction weights with annealed `β`
-- Priority updates after each gradient step from latest TD errors.
+## Phase 2 variance analysis
 
-**Tested On:**
-- `CartPole-v1`
-- `LunarLander-v3`
-
-## Rainbow DQN
-*File: `baselines/rainbow_experiment.py`*
-
-**Paper alignment (Hessel et al., 2018):**
-- Combined components:
-  - Double DQN
-  - Dueling network
-  - Prioritized replay
-  - Multi-step returns (`n=3`)
-  - Noisy linear exploration
-  - Distributional RL (C51 with 51 atoms)
-- Adapted to low-dimensional state inputs via MLP encoder instead of Atari CNN.
-
-**Tested On:**
-- `CartPole-v1`
-- `LunarLander-v3`
-
-## Soft Actor-Critic (SAC)
-*File: `baselines/sac_experiment.py`*
-
-**Characteristics:**
-- Off-policy
-- Model-free
-- Continuous action spaces only
-- Entropy-regularized: Maximizes both expected return and policy entropy. This encourages robust exploration and captures broader optimal policies compared to deterministic methods.
-
-**Tested On:**
-- `Pendulum-v1`
-- `LunarLanderContinuous-v3`
-
-## Variance Analysis (Phase 2)
-
-In `experiments/compare_phase1.py`, we run 3 seeds for each environment/algorithm combo. Because RL can be highly sensitive to initial weights and environment seeds, single-run curves are misleading.
-
-The analysis outputs curves to `analysis/figures/`, plotting the **mean ± shaded standard deviation**. This clearly visualizes, for instance, how much more variance DQN exhibits early in training compared to the stable climb of PPO.
+`src/rl_experiments/experiments/compare_phase1.py` runs multi-seed comparisons and generates mean-plus-variance plots. This is critical for RL because single-seed conclusions are often unstable.

@@ -31,6 +31,8 @@ Training Algorithm (Algorithm 1 from the paper):
          L_r = MSE(r̂_k, u_k)         reward loss
 
 Mac GPU: device="mps" for Apple Silicon.
+
+Networks and MCTS budget are reduced vs full-scale MuZero; see ``docs/algorithm_fidelity.md``.
 """
 
 import numpy as np
@@ -41,7 +43,6 @@ import gymnasium as gym
 from pathlib import Path
 from tqdm import tqdm
 from rich.console import Console
-from rich.rule import Rule
 
 from rl_experiments.utils.device_utils import get_device
 from rl_experiments.utils.metrics import ExperimentLogger

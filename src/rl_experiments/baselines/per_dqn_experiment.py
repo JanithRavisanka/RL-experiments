@@ -3,6 +3,8 @@ PER-DQN experiment runner.
 Schaul et al., 2015 — Prioritized Experience Replay.
 """
 
+import os
+
 from rich.console import Console
 from rich.rule import Rule
 

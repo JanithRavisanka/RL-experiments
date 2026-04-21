@@ -19,9 +19,9 @@ This script:
 Mac GPU: inherits device from utils/device_utils.py
 """
 
+import os
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.gridspec as gridspec
 from pathlib import Path
 from rich.console import Console
 from rich.rule import Rule

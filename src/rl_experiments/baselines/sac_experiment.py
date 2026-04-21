@@ -25,6 +25,8 @@ SAC is designed for CONTINUOUS action spaces.
 Mac GPU: device="mps" for Apple Silicon.
 """
 
+import os
+
 import gymnasium as gym
 from stable_baselines3 import SAC
 from rich.console import Console

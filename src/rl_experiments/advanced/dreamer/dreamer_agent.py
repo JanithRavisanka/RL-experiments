@@ -24,9 +24,12 @@ Training algorithm (Algorithm 1 from Hafner et al. 2019):
        - Update target critic (slow EMA)
 
 Mac GPU: uses device="mps" on Apple Silicon.
+
+Hyperparameters are scaled for low-dim / discrete control; see ``docs/algorithm_fidelity.md``.
 """
 
 import copy
+import os
 import numpy as np
 import torch
 import torch.nn as nn
@@ -34,7 +37,6 @@ import gymnasium as gym
 from pathlib import Path
 from tqdm import tqdm
 from rich.console import Console
-from rich.rule import Rule
 
 from rl_experiments.utils.device_utils import get_device
 from rl_experiments.utils.metrics import ExperimentLogger
@@ -152,8 +154,7 @@ class DreamerAgent:
         )
         self.n_actions = n_actions
         self.obs_dim   = obs_dim
-        action_dim_store   = action_dim
-        self.action_dim    = action_dim
+        self.action_dim = action_dim
 
     # ─────────────────────────────────────────────────────────────────────────
     # Environment interaction
@@ -174,7 +175,6 @@ class DreamerAgent:
         embed = self.wm.encoder(obs_t)
 
         # Update h with GRU, then get posterior z
-        import torch.nn.functional as F
         prev_act = torch.zeros(1, self.action_dim, device=self.device)
         gru_in   = torch.cat([z, prev_act], dim=-1)
         h_new    = self.wm.rssm.gru(gru_in, h)

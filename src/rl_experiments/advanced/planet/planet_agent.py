@@ -6,7 +6,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from rich.console import Console
-from rich.rule import Rule
 
 from rl_experiments.advanced.common.envs import make_pixel_env, obs_to_chw
 from rl_experiments.advanced.common.replay import SequenceReplay

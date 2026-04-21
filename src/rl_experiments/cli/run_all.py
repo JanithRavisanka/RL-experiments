@@ -19,7 +19,6 @@ from pathlib import Path
 
 from rich.console import Console
 from rich.panel import Panel
-from rich.rule import Rule
 from rich.table import Table
 
 from rl_experiments.api.training import TrainConfig, train
@@ -397,7 +396,7 @@ def write_run_metadata(run_id: str, args, start_unix: float, start_iso: str):
 
 
 def run_phase4():
-    from rl_experiments.analysis.plot_results import generate_all_plots
+    from rl_experiments.analysis.plot_figures import generate_all_plots
 
     console.rule("[bold cyan]Phase 4 — Paradigm Comparison Plots")
     generate_all_plots()

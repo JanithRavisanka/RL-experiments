@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+import os
 
 from rich.console import Console
-from rich.rule import Rule
 from stable_baselines3 import SAC
 import numpy as np
 import torch
