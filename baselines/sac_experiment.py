@@ -101,6 +101,7 @@ def run_sac(env_id: str, total_timesteps: int = 300_000, seed: int = 42, run_id:
     run_id = run_id or make_run_id()
     log_path = build_log_path("sac", env_id, seed, run_id)
     cb = RLMetricsCallback(log_path=log_path)
+    os.makedirs("logs/tensorboard/sac", exist_ok=True)
 
     model = SAC(
         policy="MlpPolicy",

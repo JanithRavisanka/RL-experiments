@@ -92,6 +92,7 @@ def run_ppo(env_id: str, total_timesteps: int = 200_000, seed: int = 42, run_id:
     # Metrics callback
     log_path = build_log_path("ppo", env_id, seed, run_id)
     cb = RLMetricsCallback(log_path=log_path)
+    os.makedirs("logs/tensorboard/ppo", exist_ok=True)
 
     model = PPO(
         policy="MlpPolicy",

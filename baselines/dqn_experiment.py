@@ -102,6 +102,7 @@ def run_dqn(env_id: str, total_timesteps: int = 200_000, seed: int = 42, run_id:
     run_id = run_id or make_run_id()
     log_path = build_log_path("dqn", env_id, seed, run_id)
     cb = RLMetricsCallback(log_path=log_path)
+    os.makedirs("logs/tensorboard/dqn", exist_ok=True)
 
     model = DQN(
         policy="MlpPolicy",
